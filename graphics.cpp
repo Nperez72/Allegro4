@@ -9,14 +9,17 @@
 enum Turn { 
 	X_TURN = 0, 
 	O_TURN = 1
-} turn;
+};
+
+Turn turn = X_TURN; // Start with X's turn
 
 void set_graphics_x_o(int x, int y, logic &game_logic);
 void draw_board();
 void draw_x(int x, int y);
 void draw_o(int x, int y);
 void game_message(bool &gameover, logic &game_logic);
-void turn_xo(int x, int y, Turn turn, int boardx, int boardy, logic  &game_logic);
+void turn_xo(int x, int y, int boardx, int boardy, logic  &game_logic);
+bool computer_move_o(logic& game_logic);
 
 int main(void)
 {
@@ -85,13 +88,24 @@ int main(void)
 		}
 		draw_board();
 		game_message(gameover, game_logic);
-		if (draw)
+
+		// If player's turn, set X on the board
+		if (draw && turn == X_TURN)
 		{
 
 			set_graphics_x_o(posX, posY, game_logic);
 
 			draw = false;
 		}
+
+		// Let computer play when it's O's turn
+		if (turn == O_TURN && !gameover) {
+			if (computer_move_o(game_logic)) {
+				turn = X_TURN;
+				al_flip_display();
+			}
+		}
+
 		al_flip_display();
 	}
 	al_rest(5.0);
@@ -101,6 +115,23 @@ int main(void)
 	return 0;
 }
 
+
+// Returns true if a move was made
+bool computer_move_o(logic& game_logic) {
+	// Search for an empty cell to place O
+	for (int row = 0; row < 3; ++row) {
+		for (int col = 0; col < 3; ++col) {
+			// If the cell is already occupied, skip it
+			if (game_logic.set_o(row, col)) {
+				int draw_x = 106 + 213 * col; // center x + cell width * column number
+				int draw_y = 62 + 125 * row; // center y + cell height * row number
+				draw_o(draw_x, draw_y);
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 void draw_board()
 {
@@ -124,7 +155,7 @@ void draw_o(int x, int y)
 	al_draw_circle(x, y, 62, al_map_rgb(255, 255, 0), 4);
 
 }
-void turn_xo(int x, int y, Turn turn, int boardx, int boardy, logic  &game_logic)
+void turn_xo(int x, int y, int boardx, int boardy, logic  &game_logic)
 {
 	ALLEGRO_FONT *font = al_load_font("GROBOLD.ttf", 24, 0);
 	if (turn == 0)
@@ -149,41 +180,41 @@ void set_graphics_x_o(int x, int y, logic &game_logic)
 
 	if ((x<213) && (y<125))
 	{
-		turn_xo(106, 62, turn, 0, 0, game_logic);
+		turn_xo(106, 62, 0, 0, game_logic);
 	}
 	else if ((x>213) && (x<426) && (y<125))
 	{
-		turn_xo(319, 62, turn, 0, 1, game_logic);
+		turn_xo(319, 62, 0, 1, game_logic);
 	}
 	else if ((x>426) && (y<125))
 	{
-		turn_xo(533, 62, turn, 0, 2, game_logic);
+		turn_xo(533, 62, 0, 2, game_logic);
 	}
 	else if ((x<213) && (y>125) && (y<250))
 	{
-		turn_xo(106, 186, turn, 1, 0, game_logic);
+		turn_xo(106, 186, 1, 0, game_logic);
 
 	}
 	else if ((x>213) && (x<426) && (y>125) && (y<250))
 	{
-		turn_xo(319, 186, turn, 1, 1, game_logic);
+		turn_xo(319, 186, 1, 1, game_logic);
 	}
 	else if ((x>426) && (y>125) && (y<250))
 	{
-		turn_xo(533, 186, turn, 1, 2, game_logic);
+		turn_xo(533, 186, 1, 2, game_logic);
 	}
 	else if ((x<213) && (y>250) && (y<375))
 	{
-		turn_xo(106, 314, turn, 2, 0, game_logic);
+		turn_xo(106, 314, 2, 0, game_logic);
 
 	}
 	else if ((x>213) && (x<426) && (y>250) && (y<375))
 	{
-		turn_xo(319, 314, turn, 2, 1, game_logic);
+		turn_xo(319, 314, 2, 1, game_logic);
 	}
 	else if ((x>426) && (y>250) && (y<375))
 	{
-		turn_xo(533, 314, turn, 2, 2, game_logic);
+		turn_xo(533, 314, 2, 2, game_logic);
 	}
 }
 
