@@ -5,13 +5,18 @@
 #include <allegro5\allegro_native_dialog.h> 
 #include "logic.h"
 
+// Turn uses enum instead of static int for clarity
+enum Turn { 
+	X_TURN = 0, 
+	O_TURN = 1
+} turn;
 
 void set_graphics_x_o(int x, int y, logic &game_logic);
 void draw_board();
 void draw_x(int x, int y);
 void draw_o(int x, int y);
 void game_message(bool &gameover, logic &game_logic);
-void turn_xo(int x, int y, int &turn, int boardx, int boardy, logic  &game_logic);
+void turn_xo(int x, int y, Turn turn, int boardx, int boardy, logic  &game_logic);
 
 int main(void)
 {
@@ -119,7 +124,7 @@ void draw_o(int x, int y)
 	al_draw_circle(x, y, 62, al_map_rgb(255, 255, 0), 4);
 
 }
-void turn_xo(int x, int y, int &turn, int boardx, int boardy, logic  &game_logic)
+void turn_xo(int x, int y, Turn turn, int boardx, int boardy, logic  &game_logic)
 {
 	ALLEGRO_FONT *font = al_load_font("GROBOLD.ttf", 24, 0);
 	if (turn == 0)
@@ -127,7 +132,7 @@ void turn_xo(int x, int y, int &turn, int boardx, int boardy, logic  &game_logic
 		if (game_logic.set_x(boardx, boardy) == true)
 		{
 			draw_x(x, y);
-			turn = 1;
+			turn = O_TURN;
 		}
 	}
 	else
@@ -135,13 +140,13 @@ void turn_xo(int x, int y, int &turn, int boardx, int boardy, logic  &game_logic
 		if (game_logic.set_o(boardx, boardy) == true)
 		{
 			draw_o(x, y);
-			turn = 0;
+			turn = X_TURN;
 		}
 	}
 }
 void set_graphics_x_o(int x, int y, logic &game_logic)
 {
-	static int turn = 0;
+
 	if ((x<213) && (y<125))
 	{
 		turn_xo(106, 62, turn, 0, 0, game_logic);
