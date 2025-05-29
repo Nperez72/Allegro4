@@ -5,13 +5,13 @@
 #include <allegro5\allegro_native_dialog.h> 
 #include "logic.h"
 
-// Turn uses enum instead of static int for clarity
+// Turn uses enum for easy global access
 enum Turn { 
 	X_TURN = 0, 
 	O_TURN = 1
 };
 
-Turn turn = X_TURN; // Start with X's turn
+Turn turn = X_TURN; // Start with X's turn (player)
 
 void set_graphics_x_o(int x, int y, logic &game_logic);
 void draw_board();
@@ -65,7 +65,7 @@ int main(void)
 
 	game_logic.setup();
 	draw_board();
-	//game_message(gameover, game_logic);
+	game_message(gameover, game_logic);
 
 	al_flip_display();
 	while (!done && !gameover)
@@ -116,7 +116,11 @@ int main(void)
 }
 
 
-// Returns true if a move was made
+/*
+* Computer will check for available rows staring with top left row
+* It will know what rows are taken but it has no startegy to win
+* returns true if computer drew an O
+*/
 bool computer_move_o(logic& game_logic) {
 	// Search for an empty cell to place O
 	for (int row = 0; row < 3; ++row) {
